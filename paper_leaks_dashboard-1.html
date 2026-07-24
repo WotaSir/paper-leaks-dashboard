@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>India Paper Leaks 2004–2026 — Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#0b0d12; --panel:#12151c; --panel2:#171b24; --border:#232733;
+    --text:#e8eaf0; --muted:#8a90a2; --accent:#5b8cff; --accent2:#f2a65a; --danger:#e2596b;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 800px at 20% -10%, #16192280, transparent),
+               radial-gradient(1000px 700px at 100% 0%, #1a1f2c80, transparent), var(--bg);
+    color:var(--text); padding:32px 20px 60px;
+  }
+  .wrap{max-width:1180px; margin:0 auto;}
+  header{margin-bottom:28px;}
+  h1{font-size:26px; margin:0 0 6px; font-weight:700; letter-spacing:.2px;}
+  .sub{color:var(--muted); font-size:14px; max-width:720px; line-height:1.5;}
+  .stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin:24px 0 32px;}
+  .stat{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:16px 18px;}
+  .stat .num{font-size:26px; font-weight:700; color:var(--accent);}
+  .stat .lbl{font-size:12px; color:var(--muted); margin-top:4px;}
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+  .card{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:18px 20px;}
+  .card h2{font-size:14px; margin:0 0 14px; color:var(--text); font-weight:600;}
+  .card.full{grid-column:1/-1;}
+  .note{color:var(--muted); font-size:11.5px; margin-top:10px; line-height:1.5;}
+  canvas{max-height:280px;}
+  @media (max-width:760px){ .grid{grid-template-columns:1fr;} }
+  footer{margin-top:30px; color:var(--muted); font-size:11.5px; text-align:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>India Paper Leaks — 2004 to 2026</h1>
+    <div class="sub">110 catalogued exam paper-leak incidents (state + central), sourced from press reports, CBI/court filings, and government statements. Confidence-rated per incident.</div>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><div class="num">110</div><div class="lbl">Total incidents</div></div>
+    <div class="stat"><div class="num">1,692</div><div class="lbl">Total arrests</div></div>
+    <div class="stat"><div class="num">114</div><div class="lbl">Total convictions</div></div>
+    <div class="stat"><div class="num">22.5M</div><div class="lbl">Aspirants affected</div></div>
+    <div class="stat"><div class="num">80%</div><div class="lbl">State-run exams</div></div>
+  </div>
+
+  <div class="grid">
+    <div class="card full">
+      <h2>Incidents per year (2004–2026)</h2>
+      <canvas id="yearChart"></canvas>
+      <div class="note">Sharp rise from 2021–2024 (14, 15, 11, 12 incidents) — reflects both a real increase and better digitisation/reporting of older cases.</div>
+    </div>
+
+    <div class="card">
+      <h2>State vs Central exams</h2>
+      <canvas id="bodyTypeChart"></canvas>
+      <div class="note">80% of leaks hit state recruitment/education boards, not national exams — despite national exams (NEET, SSC, UGC-NET) getting most headlines.</div>
+    </div>
+
+    <div class="card">
+      <h2>Leak status (verification level)</h2>
+      <canvas id="statusChart"></canvas>
+      <div class="note">89 Confirmed, 13 Alleged, 5 officially Denied, 3 Suspected.</div>
+    </div>
+
+    <div class="card full">
+      <h2>Top 12 states/regions by incident count</h2>
+      <canvas id="areaChart"></canvas>
+      <div class="note">Madhya Pradesh's count is dominated by the multi-year Vyapam scandal (6+ linked incidents alone).</div>
+    </div>
+
+    <div class="card">
+      <h2>Incidents by political era</h2>
+      <canvas id="eraChart"></canvas>
+      <div class="note">UPA era (2004–May 2014): 24. NDA era (May 2014–now): 86. Longer NDA window + digitisation are major confounders — not a like-for-like comparison.</div>
+    </div>
+
+    <div class="card">
+      <h2>Exam-cancellation rate by era</h2>
+      <canvas id="cancelChart"></canvas>
+      <div class="note">Share of incidents where the exam was cancelled/retest ordered: 17% (UPA) vs 62% (NDA) — response has hardened over time, partly due to the 2024 Public Examinations Act.</div>
+    </div>
+
+    <div class="card full">
+      <h2>Incident rate per year, normalized by era length</h2>
+      <canvas id="rateChart"></canvas>
+      <div class="note">UPA era spans ~10.1 years (2004–May 2014) → 24 incidents ≈ <b>2.4/year</b>. NDA era spans ~12.2 years (May 2014–2026) → 86 incidents ≈ <b>7.2/year</b> — roughly a <b>3x rise in the annual rate</b>, not just a raw count. Caveat: part of this rise reflects better reporting/digitisation of older incidents rather than a purely real increase in leaks — the dataset cannot fully separate the two effects. Still, the sharp 2021–2024 clustering (52 incidents in 4 years alone) suggests the rise is not purely a reporting artifact.</div>
+    </div>
+  </div>
+
+  <div class="card full" style="margin-top:18px;">
+    <h2>Source &amp; provenance</h2>
+    <div class="note" style="font-size:12.5px;">
+      Data: <a href="https://www.kaggle.com/datasets/sujaynadkarni/india-paper-leaks-from-2004-to-2026" style="color:#5b8cff;" target="_blank">"India Paper Leaks from 2004 to 2026" — Kaggle dataset by Sujay Nadkarni</a> (paper_leaks.csv, 110 rows / 18 columns: incident_id, date, era, exam_name, conducting_body, body_type, area, leak_status, action_taken, note, arrests, convictions, aspirants_affected, linked_deaths, deaths_note, source_name, source_url, confidence).<br><br>
+      Each row in the underlying CSV is individually sourced and confidence-rated (High/Medium/Low) with a direct source_url (CBI/court filings, The Tribune, PTI, India TV, The Week, icbse.com, The420.in, etc.) — the dataset compiler cross-checked incidents against press and legal records rather than aggregating unverified claims. This dashboard aggregates that dataset; it does not add outside claims. Figures here can be independently re-derived from the same CSV.
+    </div>
+  </div>
+
+  <footer>Built from paper_leaks.csv (110 rows, 18 columns), sourced from the Kaggle dataset linked above. Death-toll figures in the source data are explicitly flagged as contested press tallies, not official causal counts — omitted here for that reason.</footer>
+</div>
+
+<script>
+const grid = 'rgba(255,255,255,0.06)';
+const muted = '#8a90a2';
+Chart.defaults.color = '#c7cad4';
+Chart.defaults.font.size = 11.5;
+
+new Chart(document.getElementById('yearChart'), {
+  type: 'bar',
+  data: {
+    labels: ["2004","2006","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023","2024","2025","2026"],
+    datasets: [{
+      label: 'Incidents',
+      data: [1,1,1,1,1,5,8,5,2,3,3,5,5,2,4,14,15,11,12,5,6],
+      backgroundColor: ctx => {
+        const y = ctx.chart.data.labels[ctx.dataIndex];
+        return parseInt(y) >= 2014 ? '#e2596b' : '#3d7bff';
+      },
+      borderRadius: 4,
+      maxBarThickness: 28
+    }]
+  },
+  options: {
+    plugins:{legend:{display:false}},
+    scales:{ x:{grid:{display:false}}, y:{grid:{color:grid}, beginAtZero:true} }
+  }
+});
+
+new Chart(document.getElementById('bodyTypeChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['State-run', 'Central'],
+    datasets: [{ data: [88,22], backgroundColor: ['#5b8cff','#f2a65a'], borderWidth:0 }]
+  },
+  options: { plugins:{legend:{position:'bottom'}} }
+});
+
+new Chart(document.getElementById('statusChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Confirmed','Alleged','Denied','Suspected'],
+    datasets: [{ data:[89,13,5,3], backgroundColor:['#4caf7d','#f2a65a','#e2596b','#8a90a2'], borderWidth:0 }]
+  },
+  options: { plugins:{legend:{position:'bottom'}} }
+});
+
+new Chart(document.getElementById('areaChart'), {
+  type: 'bar',
+  data: {
+    labels: ['All India','Madhya Pradesh','Uttar Pradesh','Gujarat','Maharashtra','Chhattisgarh','UP (statewide)','Uttarakhand (Haridwar)','Himachal Pradesh','Karnataka','Assam','Rajasthan'],
+    datasets: [{
+      data: [16,13,6,5,4,3,3,3,2,2,2,2],
+      backgroundColor: '#5b8cff',
+      borderRadius: 4
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    plugins:{legend:{display:false}},
+    scales:{ x:{grid:{color:grid}, beginAtZero:true}, y:{grid:{display:false}} }
+  }
+});
+
+new Chart(document.getElementById('eraChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['NDA (May 2014–now)','UPA (2004–May 2014)'],
+    datasets: [{ data:[86,24], backgroundColor:['#e2596b','#3d7bff'], borderWidth:0 }]
+  },
+  options: { plugins:{legend:{position:'bottom'}} }
+});
+
+new Chart(document.getElementById('rateChart'), {
+  type: 'bar',
+  data: {
+    labels: ['UPA era (2004–May 2014, ~10.1 yrs)', 'NDA era (May 2014–2026, ~12.2 yrs)'],
+    datasets: [{
+      label: 'Incidents per year',
+      data: [2.4, 7.2],
+      backgroundColor: ['#3d7bff', '#e2596b'],
+      borderRadius: 6,
+      maxBarThickness: 70
+    }]
+  },
+  options: {
+    plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>c.parsed.y+' incidents/year'}}},
+    scales:{ y:{grid:{color:grid}, beginAtZero:true, title:{display:true,text:'Incidents / year'}}, x:{grid:{display:false}} }
+  }
+});
+
+new Chart(document.getElementById('cancelChart'), {
+  type: 'bar',
+  data: {
+    labels: ['UPA era','NDA era'],
+    datasets: [{
+      label:'Cancellation rate',
+      data:[16.7, 61.6],
+      backgroundColor: ['#3d7bff','#e2596b'],
+      borderRadius: 6,
+      maxBarThickness: 60
+    }]
+  },
+  options: {
+    plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>c.parsed.y+'%'}}},
+    scales:{ y:{grid:{color:grid}, ticks:{callback:v=>v+'%'}, max:100}, x:{grid:{display:false}} }
+  }
+});
+</script>
+</body>
+</html>
